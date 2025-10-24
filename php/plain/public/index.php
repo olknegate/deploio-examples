@@ -63,9 +63,9 @@ $dbpass = getenv('DBPASS');
 $dbhost = getenv('DBHOST');
 
 $link = mysqli_init();
-mysqli_options($link, MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
-mysqli_ssl_set($link, NULL, NULL, NULL, NULL, NULL);
-mysqli_real_connect($link, $dbhost, $dbuser, $dbpass);
+mysqli_options($link, MYSQLI_CLIENT_SSL_VERIFY_SERVER_CERT, false);
+mysqli_ssl_set($link, NULL, NULL, '', NULL, NULL);
+mysqli_real_connect($link, $dbhost, $dbuser, $dbpass, NULL, NULL, NULL, MYSQLI_CLIENT_SSL | MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT );
 
 if (!$link) {
   echo mysqli_connect_errno() . ":" . mysqli_connect_error();
@@ -74,13 +74,15 @@ if (!$link) {
 
 mysqli_select_db($link, $dbname) or die("Could not open the db '$dbname'");
 
+echo "Connected to database $dbname on $dbhost\n";
+
 $test_query = "SHOW TABLES FROM $dbname";
 $result = mysqli_query($link, $test_query);
 
 $tblCnt = 0;
 while($tbl = mysqli_fetch_array($result)) {
     $tblCnt++;
-    #echo $tbl[0]."<br />\n";
+    echo $tbl[0]."<br />\n";
 }
 
 if (!$tblCnt) {
